@@ -104,7 +104,7 @@ func (l *Logger) Shutdown(ctx context.Context) error {
 func (l *Logger) emit(ctx context.Context, severity otellog.Severity, severityText, msg string, args ...any) {
 	attrs := maps.Clone(l.fields)
 	maps.Copy(attrs, core.Map(args...))
-	maps.Copy(attrs, core.Map(core.CallerFields(l.cfg.Caller)...))
+	maps.Copy(attrs, core.Map(core.CallerFields(l.cfg.Caller, l.cfg.CallerSkip)...))
 	maps.Copy(attrs, core.Map(internalotel.Fields(ctx, l.cfg)...))
 
 	var record otellog.Record

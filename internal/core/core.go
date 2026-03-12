@@ -45,6 +45,7 @@ type Config struct {
 	Level           Level
 	JSON            bool
 	Caller          bool
+	CallerSkip      int
 	OTEL            bool
 	OTELLogProvider otellog.LoggerProvider
 	TraceExtractor  TraceExtractor
@@ -122,12 +123,12 @@ func addField(fields map[string]any, key string, value any) {
 	fields[key] = value
 }
 
-func CallerFields(enabled bool) []any {
+func CallerFields(enabled bool, skip int) []any {
 	if !enabled {
 		return nil
 	}
 
-	frame, ok := callerFrame()
+	frame, ok := callerFrame(skip)
 	if !ok {
 		return nil
 	}
@@ -211,7 +212,7 @@ func errorChain(err error) []string {
 	return chain
 }
 
-func callerFrame() (runtime.Frame, bool) {
+func callerFrame(extraSkip int) (runtime.Frame, bool) {
 	pcs := make([]uintptr, 16)
 	n := runtime.Callers(3, pcs)
 	if n == 0 {
@@ -222,13 +223,22 @@ func callerFrame() (runtime.Frame, bool) {
 
 	for {
 		frame, more := frames.Next()
-		if !shouldSkipCallerFrame(frame) {
-			return frame, true
+		if shouldSkipCallerFrame(frame) {
+			if !more {
+				break
+			}
+			continue
 		}
 
-		if !more {
-			break
+		if extraSkip > 0 {
+			extraSkip--
+			if !more {
+				break
+			}
+			continue
 		}
+
+		return frame, true
 	}
 
 	return runtime.Frame{}, false

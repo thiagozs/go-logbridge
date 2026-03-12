@@ -73,7 +73,7 @@ func (a *Adapter) With(args ...any) core.Logger {
 func mergedFields(base map[string]any, cfg core.Config, ctx context.Context, args ...any) map[string]any {
 	fields := maps.Clone(base)
 	maps.Copy(fields, core.Map(args...))
-	maps.Copy(fields, core.Map(core.CallerFields(cfg.Caller)...))
+	maps.Copy(fields, core.Map(core.CallerFields(cfg.Caller, cfg.CallerSkip)...))
 	maps.Copy(fields, core.Map(otel.Fields(ctx, cfg)...))
 
 	return fields

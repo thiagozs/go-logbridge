@@ -98,7 +98,7 @@ func mergedFields(base logrus.Fields, cfg core.Config, ctx context.Context, args
 	fields := logrus.Fields{}
 	maps.Copy(fields, base)
 	maps.Copy(fields, toFields(args...))
-	addTrace(core.CallerFields(cfg.Caller), fields)
+	addTrace(core.CallerFields(cfg.Caller, cfg.CallerSkip), fields)
 	addTrace(otel.Fields(ctx, cfg), fields)
 
 	return fields

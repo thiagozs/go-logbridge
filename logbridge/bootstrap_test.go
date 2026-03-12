@@ -172,6 +172,35 @@ func TestAllAdaptersWithCaller(t *testing.T) {
 	}
 }
 
+func TestAllAdaptersWithCallerSkip(t *testing.T) {
+	engines := []Engine{Slog, Zap, Zerolog, Logrus}
+
+	for _, engine := range engines {
+		t.Run(string(engine), func(t *testing.T) {
+			output := captureOutput(t, func() {
+				logger, err := New(
+					WithEngine(engine),
+					WithLevel(Debug),
+					WithJSON(),
+					WithCallerSkip(1),
+				)
+				if err != nil {
+					t.Fatalf("initialize logger: %v", err)
+				}
+
+				service := loggerService{logger: logger}
+				callServiceInfo(context.Background(), service)
+			})
+
+			assertContains(t, output, `"caller_file":"bootstrap_test.go"`)
+			assertContains(t, output, `"caller_func":"logbridge.callServiceInfo"`)
+			assertContains(t, output, `"caller_line":"`)
+			assertNotContains(t, output, `services.(*LoggerService).Info`)
+			assertNotContains(t, output, `"caller_func":"logbridge.loggerService.Info"`)
+		})
+	}
+}
+
 func TestAllAdaptersWithFields(t *testing.T) {
 	engines := []Engine{Slog, Zap, Zerolog, Logrus}
 
@@ -210,6 +239,18 @@ func TestAllAdaptersWithFields(t *testing.T) {
 			assertNotContains(t, output, `"env":"test"`)
 		})
 	}
+}
+
+type loggerService struct {
+	logger Logger
+}
+
+func (s loggerService) Info(ctx context.Context, msg string) {
+	s.logger.Info(ctx, msg)
+}
+
+func callServiceInfo(ctx context.Context, service loggerService) {
+	service.Info(ctx, "adapter log entry")
 }
 
 func TestAllAdaptersFormatTimestamp(t *testing.T) {

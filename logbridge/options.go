@@ -34,6 +34,16 @@ func WithCaller() Option {
 	}
 }
 
+func WithCallerSkip(skip int) Option {
+	return func(c *Config) {
+		c.Caller = true
+		if skip < 0 {
+			skip = 0
+		}
+		c.CallerSkip = skip
+	}
+}
+
 func WithServiceName(name string) Option {
 	return func(c *Config) {
 		c.ServiceName = name
