@@ -212,6 +212,31 @@ func TestAllAdaptersWithFields(t *testing.T) {
 	}
 }
 
+func TestAllAdaptersFormatTimestamp(t *testing.T) {
+	engines := []Engine{Slog, Zap, Zerolog, Logrus}
+
+	for _, engine := range engines {
+		t.Run(string(engine), func(t *testing.T) {
+			output := captureOutput(t, func() {
+				logger, err := New(
+					WithEngine(engine),
+					WithLevel(Debug),
+					WithJSON(),
+				)
+				if err != nil {
+					t.Fatalf("initialize logger: %v", err)
+				}
+
+				logger.Info(context.Background(), "adapter log entry")
+			})
+
+			assertContains(t, output, `"ts":"20`)
+			assertNotContains(t, output, `"time":`)
+			assertNotContains(t, output, `"ts":17`)
+		})
+	}
+}
+
 func captureOutput(t *testing.T, fn func()) string {
 	t.Helper()
 

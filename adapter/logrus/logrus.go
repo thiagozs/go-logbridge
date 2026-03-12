@@ -4,6 +4,7 @@ import (
 	"context"
 	"maps"
 	"os"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/thiagozs/go-logbridge/internal/core"
@@ -23,9 +24,17 @@ func New(cfg core.Config) core.Logger {
 	logger.SetLevel(toLevel(cfg.Level))
 
 	if cfg.JSON {
-		logger.SetFormatter(&logrus.JSONFormatter{})
+		logger.SetFormatter(&logrus.JSONFormatter{
+			TimestampFormat: time.RFC3339Nano,
+			FieldMap: logrus.FieldMap{
+				logrus.FieldKeyTime: "ts",
+			},
+		})
 	} else {
-		logger.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
+		logger.SetFormatter(&logrus.TextFormatter{
+			FullTimestamp:   true,
+			TimestampFormat: time.RFC3339Nano,
+		})
 	}
 
 	return &Adapter{

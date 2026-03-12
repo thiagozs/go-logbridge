@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"maps"
 	"os"
+	"time"
 
 	"github.com/thiagozs/go-logbridge/internal/core"
 	"github.com/thiagozs/go-logbridge/internal/otel"
@@ -19,7 +20,16 @@ type Adapter struct {
 func New(cfg core.Config) core.Logger {
 
 	var handler slog.Handler
-	opts := &slog.HandlerOptions{Level: toLevel(cfg.Level)}
+	opts := &slog.HandlerOptions{
+		Level: toLevel(cfg.Level),
+		ReplaceAttr: func(_ []string, attr slog.Attr) slog.Attr {
+			if attr.Key == slog.TimeKey {
+				return slog.String("ts", attr.Value.Time().Format(time.RFC3339Nano))
+			}
+
+			return attr
+		},
+	}
 
 	if cfg.JSON {
 		handler = slog.NewJSONHandler(os.Stdout, opts)

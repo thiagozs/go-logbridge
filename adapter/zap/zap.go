@@ -25,6 +25,7 @@ func New(cfg core.Config) core.Logger {
 	zapCfg.Level = zap.NewAtomicLevelAt(toLevel(cfg.Level))
 	zapCfg.DisableStacktrace = true
 	zapCfg.DisableCaller = true
+	zapCfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 
 	logger, err := zapCfg.Build()
 	if err != nil {

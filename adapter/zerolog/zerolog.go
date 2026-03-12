@@ -4,6 +4,7 @@ import (
 	"context"
 	"maps"
 	"os"
+	"time"
 
 	"github.com/rs/zerolog"
 	"github.com/thiagozs/go-logbridge/internal/core"
@@ -17,6 +18,8 @@ type Adapter struct {
 }
 
 func New(cfg core.Config) core.Logger {
+	zerolog.TimestampFieldName = "ts"
+	zerolog.TimeFieldFormat = time.RFC3339Nano
 
 	var logger zerolog.Logger
 
