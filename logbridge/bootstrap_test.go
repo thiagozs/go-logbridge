@@ -241,6 +241,59 @@ func TestAllAdaptersWithFields(t *testing.T) {
 	}
 }
 
+func TestAllAdaptersFormattedMessages(t *testing.T) {
+	engines := []Engine{Slog, Zap, Zerolog, Logrus}
+
+	for _, engine := range engines {
+		t.Run(string(engine), func(t *testing.T) {
+			output := captureOutput(t, func() {
+				logger, err := New(
+					WithEngine(engine),
+					WithLevel(Debug),
+					WithJSON(),
+				)
+				if err != nil {
+					t.Fatalf("initialize logger: %v", err)
+				}
+
+				logger.Infof(context.Background(), "payment %s received", "pay-123")
+				logger.Warnf(context.Background(), "attempt %d delayed", 2)
+				logger.Errorf(context.Background(), "payment %s failed", "pay-123")
+			})
+
+			assertContains(t, output, "payment pay-123 received")
+			assertContains(t, output, "attempt 2 delayed")
+			assertContains(t, output, "payment pay-123 failed")
+		})
+	}
+}
+
+func TestFormattedMessagesWithFanout(t *testing.T) {
+	output := captureOutput(t, func() {
+		logger, err := New(
+			WithEngine(Zap),
+			WithLevel(Debug),
+			WithJSON(),
+			WithOTLP(lognoop.NewLoggerProvider()),
+		)
+		if err != nil {
+			t.Fatalf("initialize logger: %v", err)
+		}
+
+		logger.Infof(context.Background(), "payment %s received", "pay-123")
+		logger.Warnf(context.Background(), "attempt %d delayed", 2)
+		logger.Errorf(context.Background(), "payment %s failed", "pay-123")
+
+		if err := Shutdown(context.Background(), logger); err != nil {
+			t.Fatalf("shutdown logger: %v", err)
+		}
+	})
+
+	assertContains(t, output, "payment pay-123 received")
+	assertContains(t, output, "attempt 2 delayed")
+	assertContains(t, output, "payment pay-123 failed")
+}
+
 type loggerService struct {
 	logger Logger
 }

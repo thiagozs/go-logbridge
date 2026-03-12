@@ -21,8 +21,11 @@ O logger expõe a mesma interface para todos os engines:
 type Logger interface {
     Debug(ctx context.Context, msg string, args ...any)
     Info(ctx context.Context, msg string, args ...any)
+    Infof(ctx context.Context, format string, args ...any)
     Warn(ctx context.Context, msg string, args ...any)
+    Warnf(ctx context.Context, format string, args ...any)
     Error(ctx context.Context, msg string, args ...any)
+    Errorf(ctx context.Context, format string, args ...any)
 
     With(args ...any) Logger
 }
@@ -63,9 +66,10 @@ import (
 
 func main() {
     log, err := logbridge.New(
-        logbridge.WithEngine(logbridge.Zap),
-        logbridge.WithLevel(logbridge.Info),
-        logbridge.WithJSON(),
+        logbridge.WithEngine(logbridge.Zap), // motor utilizado
+        logbridge.WithLevel(logbridge.Info), // define o nivel do log
+        logbridge.WithJSON(), // formato json
+        logbridge.WithCallerSkip(1), // ajusta o número de frames que serão ignorados
     )
     if err != nil {
         panic(err)

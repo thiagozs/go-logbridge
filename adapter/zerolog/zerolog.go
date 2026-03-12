@@ -2,6 +2,7 @@ package zerolog
 
 import (
 	"context"
+	"fmt"
 	"maps"
 	"os"
 	"time"
@@ -49,14 +50,26 @@ func (a *Adapter) Debug(ctx context.Context, msg string, args ...any) {
 	event.Fields(mergedFields(a.fields, a.cfg, ctx, args...)).Msg(msg)
 }
 
+func (a *Adapter) Infof(ctx context.Context, format string, args ...any) {
+	a.Info(ctx, fmt.Sprintf(format, args...))
+}
+
 func (a *Adapter) Warn(ctx context.Context, msg string, args ...any) {
 	event := a.log.Warn()
 	event.Fields(mergedFields(a.fields, a.cfg, ctx, args...)).Msg(msg)
 }
 
+func (a *Adapter) Warnf(ctx context.Context, format string, args ...any) {
+	a.Warn(ctx, fmt.Sprintf(format, args...))
+}
+
 func (a *Adapter) Error(ctx context.Context, msg string, args ...any) {
 	event := a.log.Error()
 	event.Fields(mergedFields(a.fields, a.cfg, ctx, args...)).Msg(msg)
+}
+
+func (a *Adapter) Errorf(ctx context.Context, format string, args ...any) {
+	a.Error(ctx, fmt.Sprintf(format, args...))
 }
 
 func (a *Adapter) With(args ...any) core.Logger {

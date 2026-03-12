@@ -73,12 +73,24 @@ func (l *Logger) Info(ctx context.Context, msg string, args ...any) {
 	l.emit(ctx, otellog.SeverityInfo, "INFO", msg, args...)
 }
 
+func (l *Logger) Infof(ctx context.Context, format string, args ...any) {
+	l.Info(ctx, fmt.Sprintf(format, args...))
+}
+
 func (l *Logger) Warn(ctx context.Context, msg string, args ...any) {
 	l.emit(ctx, otellog.SeverityWarn, "WARN", msg, args...)
 }
 
+func (l *Logger) Warnf(ctx context.Context, format string, args ...any) {
+	l.Warn(ctx, fmt.Sprintf(format, args...))
+}
+
 func (l *Logger) Error(ctx context.Context, msg string, args ...any) {
 	l.emit(ctx, otellog.SeverityError, "ERROR", msg, args...)
+}
+
+func (l *Logger) Errorf(ctx context.Context, format string, args ...any) {
+	l.Error(ctx, fmt.Sprintf(format, args...))
 }
 
 func (l *Logger) With(args ...any) core.Logger {

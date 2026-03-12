@@ -16,8 +16,11 @@ import (
 type Logger interface {
 	Debug(ctx context.Context, msg string, args ...any)
 	Info(ctx context.Context, msg string, args ...any)
+	Infof(ctx context.Context, format string, args ...any)
 	Warn(ctx context.Context, msg string, args ...any)
+	Warnf(ctx context.Context, format string, args ...any)
 	Error(ctx context.Context, msg string, args ...any)
+	Errorf(ctx context.Context, format string, args ...any)
 
 	With(args ...any) Logger
 }

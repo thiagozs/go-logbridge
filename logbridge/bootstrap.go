@@ -2,6 +2,7 @@ package logbridge
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/thiagozs/go-logbridge/adapter/logrus"
 	"github.com/thiagozs/go-logbridge/adapter/slog"
@@ -65,14 +66,32 @@ func (l *fanoutLogger) Info(ctx context.Context, msg string, args ...any) {
 	l.remote.Info(ctx, msg, args...)
 }
 
+func (l *fanoutLogger) Infof(ctx context.Context, format string, args ...any) {
+	msg := fmt.Sprintf(format, args...)
+	l.local.Info(ctx, msg)
+	l.remote.Info(ctx, msg)
+}
+
 func (l *fanoutLogger) Warn(ctx context.Context, msg string, args ...any) {
 	l.local.Warn(ctx, msg, args...)
 	l.remote.Warn(ctx, msg, args...)
 }
 
+func (l *fanoutLogger) Warnf(ctx context.Context, format string, args ...any) {
+	msg := fmt.Sprintf(format, args...)
+	l.local.Warn(ctx, msg)
+	l.remote.Warn(ctx, msg)
+}
+
 func (l *fanoutLogger) Error(ctx context.Context, msg string, args ...any) {
 	l.local.Error(ctx, msg, args...)
 	l.remote.Error(ctx, msg, args...)
+}
+
+func (l *fanoutLogger) Errorf(ctx context.Context, format string, args ...any) {
+	msg := fmt.Sprintf(format, args...)
+	l.local.Error(ctx, msg)
+	l.remote.Error(ctx, msg)
 }
 
 func (l *fanoutLogger) With(args ...any) Logger {

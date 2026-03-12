@@ -2,6 +2,7 @@ package slog
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"maps"
 	"os"
@@ -52,12 +53,24 @@ func (a *Adapter) Debug(ctx context.Context, msg string, args ...any) {
 	a.log.DebugContext(ctx, msg, mergedArgs(a.fields, a.cfg, ctx, args...)...)
 }
 
+func (a *Adapter) Infof(ctx context.Context, format string, args ...any) {
+	a.Info(ctx, fmt.Sprintf(format, args...))
+}
+
 func (a *Adapter) Error(ctx context.Context, msg string, args ...any) {
 	a.log.ErrorContext(ctx, msg, mergedArgs(a.fields, a.cfg, ctx, args...)...)
 }
 
+func (a *Adapter) Warnf(ctx context.Context, format string, args ...any) {
+	a.Warn(ctx, fmt.Sprintf(format, args...))
+}
+
 func (a *Adapter) Warn(ctx context.Context, msg string, args ...any) {
 	a.log.WarnContext(ctx, msg, mergedArgs(a.fields, a.cfg, ctx, args...)...)
+}
+
+func (a *Adapter) Errorf(ctx context.Context, format string, args ...any) {
+	a.Error(ctx, fmt.Sprintf(format, args...))
 }
 
 func (a *Adapter) With(args ...any) core.Logger {
