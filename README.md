@@ -7,6 +7,12 @@ Wrapper de logging para Go com uma API única sobre `zap`, `slog`, `zerolog` e `
 - correlação com OpenTelemetry via `context.Context`
 - export de logs OTLP
 
+![Loki dataset](assets/loki_screenshot.png)
+
+![Tempo dataset](assets/tempo_screenshot.png)
+
+![Fields dataset](assets/fields_screenshot.png)
+
 ## Instalação
 
 ```bash
